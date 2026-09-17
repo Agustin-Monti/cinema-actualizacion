@@ -1,0 +1,26 @@
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { PromotionForm } from '@/components/admin/promotions/PromotionForm'
+
+export const dynamic = 'force-dynamic'
+
+export default async function EditPromotionPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+
+  const adminClient = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } }
+  )
+
+  const { data: promotion } = await adminClient
+    .from('promotions')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  return <PromotionForm promotion={promotion} isEdit />
+}
